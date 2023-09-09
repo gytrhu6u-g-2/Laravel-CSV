@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CSVController;
+use App\Http\Controllers\GenerateArrayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,5 +17,8 @@ use App\Http\Controllers\CSVController;
 
 Route::get('/', [CSVController::class, 'index'])->name('index');
 
-Route::get('/download', [CSVController::class, 'download'])->name('download');
+// 配列生成
+Route::post('/generate', [GenerateArrayController::class, 'generateArr'])->name('generateArr');
 
+// CSVダウンロード
+Route::post('/download', [CSVController::class, 'download'])->name('download');

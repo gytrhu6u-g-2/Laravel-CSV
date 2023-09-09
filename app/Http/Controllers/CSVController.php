@@ -11,11 +11,10 @@ class CSVController extends Controller
 
     public function index()
     {
-        // phpinfo();
         return view('csv');
     }
 
-    public function download()
+    public function download(Request $request)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();

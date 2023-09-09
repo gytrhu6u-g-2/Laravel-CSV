@@ -1,0 +1,40 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.hole__container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.input__container {
+    width: 70%;
+    height: 90%;
+    min-width: 300px;
+    min-height: 500px;
+    position: relative;
+}
+
+.input__items {
+    width: 80%;
+    height: 75%;
+    padding-top: 25px;
+}
+
+.input__items__container {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+.csvBtn__container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
