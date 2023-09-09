@@ -8,34 +8,40 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class CSVController extends Controller
 {
-
     public function index()
     {
         return view('csv');
     }
 
+    // CSVファイルダウンロード
     public function download(Request $request)
     {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+        // sessionから変数を取り出す
+        $chunk = $request->session()->get('csv_chunk');
 
-        //今は単純な配列のデータにしているが、実際にはこのデータを作るためにDBから情報を取り出し、配列に入れる処理が必要。
-        $data = [
-            ['名前', 'ひらがな', '年齢', '性別'],
-            ['太郎', 'たろう', '12才', '男'],
-            ['花子', 'はなこ', '15才', '女'],
-        ];
+        if ($chunk != null) {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->fromArray($data, null, 'A1');
 
-        // Excelファイルをブラウザからダウンロードする
-        $fileName = 'ユーザーリスト' . date('Y_m_d') . '.xlsx';
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;');
-        header("Content-Disposition: attachment; filename=\"{$fileName}\"");
-        header('Cache-Control: max-age=0');
+            // スプレッドシートにデータを追加します。
+            $sheet->fromArray($chunk, null, 'A1');
 
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $writer->save('php://output');
-        exit;
+            // Excelダウンロード用の適切なヘッダーを設定します。
+            $fileName = 'ユーザーリスト' . date('Y_m_d') . '.xlsx';
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;');
+            header("Content-Disposition: attachment; filename=\"{$fileName}\"");
+            header('Cache-Control: max-age=0');
+
+            // Excelライターを作成し、ファイルを出力ストリームに保存します。
+            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save('php://output');
+
+            // session削除
+            $request->session()->forget('csv_chunk');
+            exit;
+        }
+
+        return redirect(route('index'));
     }
 }

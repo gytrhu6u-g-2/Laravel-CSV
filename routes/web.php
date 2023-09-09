@@ -19,6 +19,7 @@ Route::get('/', [CSVController::class, 'index'])->name('index');
 
 // 配列生成
 Route::post('/generate', [GenerateArrayController::class, 'generateArr'])->name('generateArr');
+// Route::post('/generate', [CSVController::class, 'download'])->name('download');
 
 // CSVダウンロード
 Route::post('/download', [CSVController::class, 'download'])->name('download');

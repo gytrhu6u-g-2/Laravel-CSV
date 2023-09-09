@@ -91,26 +91,27 @@
                 </div>
                 <div class="container-fluid d-flex justify-content-center mt-4 mb-2 p-0 csvBtn__container">
                     <button type="button" class="btn btn-primary me-3 generate">CSV配列生成</button>
-                    @if (isset($chunk))
                     <form action="{{ route('download') }}" method="POST">
-                        <button type="submit" class="btn btn-primary ms-3">CSVダウンロード</button>
+                        @csrf
+                        <button type="submit" class="btn btn-primary ms-3">ダウンロード</button>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                     </form>
-
-                    @endif
                 </div>
             </div>
         </div>
 
 </body>
 <script>
-    var generate = document.querySelector(".generate");
+    // ダウンロード時に使う配列
     var csvArray = [];
+    // CSV配列生成ボタン
+    var generate = document.querySelector(".generate");
 
 generate.addEventListener("click", function(){
     generateArr();
 });
 
+// CSV配列生成処理
 async function generateArr()
 {
     var completion = document.getElementById("completion").value;
@@ -133,8 +134,6 @@ async function generateArr()
         print_information2: print_information2
     }
 
-
-
     try {
         const url = "{{ route('generateArr') }}";
         const response = await fetch(url, {
@@ -152,7 +151,6 @@ async function generateArr()
         console.log(error);
         alert(`通信に失敗しました。\r\n ${error}`);
     }
-    
 }
 </script>
 
