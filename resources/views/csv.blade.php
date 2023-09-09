@@ -12,7 +12,16 @@
 
 <body>
     <div class="container p-5">
-        <button type="button" onclick="location.href='{{ route('download') }}'" class="btn btn-primary">CSV Dowonload</button>
+        <button type="button" onclick="location.href='{{ route('download') }}'" class="btn btn-primary">CSV
+            Dowonload</button>
+    </div>
+    <div class="container p-5">
+        <input id="fileselector" type="file" onchange="browseResult(event)" webkitdirectory directory multiple="false"
+            style="display:none" />
+        <button onclick="getElementById('fileselector').click()">browse</button>
+    </div>
+    <div>
+        <input id="file" type="file" name="upfile[]" webkitdirectory>
     </div>
 </body>
 
