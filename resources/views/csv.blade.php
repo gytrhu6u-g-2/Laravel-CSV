@@ -71,8 +71,14 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-2">
-                                <label for="process">数量:</label>
+                                <label for="num">数量:</label>
                                 <input type="number" id="num" name="num" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-2">
+                                <label for="completion_piece">仕上げ付丁数:</label>
+                                <input type="number" id="completion_piece" name="completion_piece" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -120,6 +126,7 @@ async function generateArr()
     var column = document.getElementById("column").value;
     var process = document.getElementById("process").value;
     var num = document.getElementById("num").value;
+    var completion_piece = document.getElementById("completion_piece").value;
     var print_information1 = document.getElementById("print_information1").value;
     var print_information2 = document.getElementById("print_information2").value;
 
@@ -130,6 +137,7 @@ async function generateArr()
         column: column,
         process: process,
         num: num,
+        completion_piece: completion_piece,
         print_information1: print_information1,
         print_information2: print_information2
     }
