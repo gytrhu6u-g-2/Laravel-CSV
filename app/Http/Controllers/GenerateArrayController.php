@@ -36,10 +36,9 @@ class GenerateArrayController extends Controller
             if ($input['floating'] == 2) {
                 // 初期の値を設定
                 $arr = [0];
-                // 最後のキー取得
-                $last_key = array_keys($arr)[count($arr) - 1];
+
                 // 最後のキーの0番目の値
-                $last = $arr[$last_key];
+                $last = $this->get_last_key_value($arr);
 
                 // 列数
                 $column = (int)$input['column'];
@@ -66,6 +65,9 @@ class GenerateArrayController extends Controller
                             $arr[0] = $print_information1;
                             $print_information1 += 1;
                         }
+                        if ($print_information1 >= $print_information2) {
+                            break;
+                        }
                         // 配列に印字内容1を入れていく
                         array_push($arr, $print_information1);
                         $print_information1 += 1;
@@ -73,10 +75,9 @@ class GenerateArrayController extends Controller
                         // 初回1ループ目の配列0番目だけ
                         $first_arr += 1;
                     }
-                    // 最後のキー取得
-                    $last_key = array_keys($arr)[count($arr) - 1];
+
                     // 最後のキーの0番目の値
-                    $last = $arr[$last_key];
+                    $last = $this->get_last_key_value($arr);
 
                     // 逆N字　計算
                     $print_information1 = $piece * ($column - 1) + 1;
@@ -86,8 +87,45 @@ class GenerateArrayController extends Controller
                     $i = 0;
 
                     // 最後のキーのn番目の値＋丁数が印字内容2の値を上回ると強制でbreak
-                    if ($last + $piece >= $print_information2) {
+                    if ($print_information1 >= $print_information2) {
                         break;
+                    }
+                }
+
+                $count = count($arr);
+                $chunk = array_chunk($arr, 1);
+                $piece2 = $input['completion_piece'] / $column;
+                for ($i = 0; $i < $count; $i++) {
+                    $arr_value = $arr[$i];
+                    for ($j = 1; $j < $column; $j++) {
+                        $arr_piece = $arr_value + $piece;
+
+                        if ($arr_piece >= $print_information2) {
+                            break;
+                        }
+                        array_push($chunk[$i], $arr_piece);
+                        $piece += $piece2;
+                    }
+                    if ($arr_piece >= $print_information2) {
+                        break;
+                    }
+                    $piece = $piece / $j;
+                    $j = 1;
+                }
+                // 0番目の値数
+                $first = count($chunk[0]);
+                $count = count($chunk);
+                for ($i = 0; $i < $count; $i++) {
+                    // 最後のキーの値数
+                    $last = count($chunk[$i]);
+
+                    // 0番目と最後のキーの値が等しくない場合、足りない分「""」を追加
+                    if ($first != $last) {
+                        $shortage = $first - $last;
+                        for ($k = 0; $k < $shortage; $k++) {
+                            array_push($chunk[$i], "");
+                        }
+                        $k = 0;
                     }
                 }
             }
@@ -132,5 +170,20 @@ class GenerateArrayController extends Controller
         }
 
         return $chunk;
+    }
+
+    /**
+     * 最後のキーの0番目の値を取得
+     * @param arr
+     * @return arr 
+     */
+    public function get_last_key_value($arr)
+    {
+        // 最後のキー取得
+        $last_key = array_keys($arr)[count($arr) - 1];
+        // 最後のキーの0番目の値
+        $last = $arr[$last_key];
+
+        return $last;
     }
 }
