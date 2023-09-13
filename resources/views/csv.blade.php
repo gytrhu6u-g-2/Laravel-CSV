@@ -59,6 +59,17 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-2">
+                                <label for="direction">天地・左右:</label>
+                                <select class="form-select" aria-label="Default select example" name="direction"
+                                    id="direction">
+                                    <option selected value="">未選択</option>
+                                    <option value="1">天地</option>
+                                    <option value="2">左右</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-2">
                                 <label for="column">仕上げ列数:</label>
                                 <input type="number" id="column" name="column" class="form-control">
                             </div>
@@ -127,6 +138,7 @@ async function generateArr()
     var process = document.getElementById("process").value;
     var num = document.getElementById("num").value;
     var completion_piece = document.getElementById("completion_piece").value;
+    var direction = document.getElementById("direction").value;
     var print_information1 = document.getElementById("print_information1").value;
     var print_information2 = document.getElementById("print_information2").value;
 
@@ -138,6 +150,7 @@ async function generateArr()
         process: process,
         num: num,
         completion_piece: completion_piece,
+        direction: direction,
         print_information1: print_information1,
         print_information2: print_information2
     }
