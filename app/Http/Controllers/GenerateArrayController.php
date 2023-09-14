@@ -16,15 +16,42 @@ class GenerateArrayController extends Controller
         $input = $request->all();
         $arr = [];
 
+        // 天地
         if ($input['direction'] == 1) {
-            // シートの場合
+            // シート
             if ($input['completion'] == 1) {
+
+                // レコードの総束数
+                $Total_number_of_bundles_record = ceil($input['num'] / ($input['completion_data']['completion_piece'] * $input['completion_data']['a_bundle_of_sheet']));
+                // １束
+                $a_bundle = $input['completion_data']['completion_piece'] * $input['completion_data']['a_bundle_of_sheet'];
+                // 1束のｍ (小数点以下切り上げ)
+                $a_bundle_of_meters = ceil($a_bundle / $input['column'] * $input['send_designation2'] / 1000);
+                // 1ファイル分の最大束数 (小数点以下切り捨て)
+                $maximum_number_of_bundles = floor($input['completion_data']['max_base_sheet'] / $a_bundle_of_meters);
+                // ロット数 (切り上げ)
+                $rot = ceil($Total_number_of_bundles_record / $maximum_number_of_bundles);
 
                 // 流れ方向　Z字
                 if ($input['floating'] == 1) {
-                    // 印字内容の範囲分配列に追加
-                    for ($i = (int)$input['print_information1']; $i < (int)$input['print_information2'] + 1; $i++) {
-                        array_push($arr, $i);
+
+                    $print_information1 = (int)$input['print_information1'];
+                    // レコードの総束数分for文で配列を作る数字を指定
+                    for ($a = 0; $a < $Total_number_of_bundles_record; $a++) {
+                        // 多次元配列
+                        $subArray = [];
+                        // 一束に入る数量を超えたら新しい配列を作る
+                        // 印字内容の範囲分配列に追加
+                        for ($i = $print_information1; $i <= (int)$input['print_information2']; $i++) {
+                            // 一束の数を超えたらbreak
+                            if ($i >= $print_information1 + $a_bundle) {
+                                $print_information1 += $i;
+                                break;
+                            }
+                            array_push($subArray, $i);
+                        }
+                        // 多次元配列に新しい配列を追加
+                        array_push($arr, $subArray);
                     }
 
                     // 昇順・降順
@@ -44,13 +71,13 @@ class GenerateArrayController extends Controller
                     // 列数
                     $column = (int)$input['column'];
                     // 丁数
-                    $piece = $input['completion_piece'] / $column;
+                    $piece = $input['completion_data']['completion_piece'] / $column;
                     // 印字内容1
                     $print_information1 = (int)$input['print_information1'];
                     // 印字内容2
                     $print_information2 = (int)$input['print_information2'];
                     // 仕上げ付丁数
-                    $completion_piece = (int)$input['completion_piece'];
+                    $completion_piece = (int)$input['completion_data']['completion_piece'];
 
                     // 昇順・降順
                     if ($input['sort']) {
@@ -72,8 +99,14 @@ class GenerateArrayController extends Controller
      */
     public function Zsort($arr, $column, $sort)
     {
+
+        $chunks = array(); // 空の配列を初期化
+
+        for ($i = 0; $i < count($arr); $i++) {
+            $chunks = array_merge($chunks, $arr[$i]); // $chunksに新しい要素を追加
+        }
         // インデックスを仕上げ列数に分ける
-        $chunk = array_chunk($arr, (int)$column);
+        $chunk = array_chunk($chunks, (int)$column);
         // 0番目の値数
         $first = count($chunk[0]);
         // 最後のキー取得
@@ -93,6 +126,25 @@ class GenerateArrayController extends Controller
         if ($sort == 2) {
             return $chunk = $this->descendDirection($chunk);
         }
+
+
+
+        // $aaaaa = $chunk[0][1][0];
+
+        // foreach ($chunk as $chunk) {
+        //     $j = 0;
+        //     for ($i = 0; $i < count($chunk); $i++) {
+        //         // $unko = $this->get_last_key_value($chunk[$i]);
+        //         $last_key = array_key_last($chunk[$i]);
+        //         for ($j = 0; $j < $last_key; $j++) {
+        //             array_push($abc, $chunk[$i][$j]);
+        //             if ($j == $last_key -1) {
+        //                 break;
+        //             }
+        //         }
+        //     }
+        // }
+
 
         return $chunk;
     }

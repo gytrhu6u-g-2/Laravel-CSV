@@ -16,9 +16,6 @@
 
 <body>
     <div class="hole__container">
-        @if (isset($chunk))
-        <h4 class="ms-3">配列を受け取りました</h4>
-        @endif
         <div class="container border border-primary input__container">
             <h3 class="text-center mt-3">入力項目</h3>
             <div class="container input__items">
@@ -76,25 +73,47 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-2">
-                                <label for="process">工程数:</label>
-                                <input type="number" id="process" name="process" class="form-control">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group mb-2">
                                 <label for="num">数量:</label>
                                 <input type="number" id="num" name="num" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-2">
-                                <label for="completion_piece">仕上げ付丁数:</label>
-                                <input type="number" id="completion_piece" name="completion_piece" class="form-control">
+                                <label for="each_page">各枚数:</label>
+                                <input type="number" id="each_page" name="each_page" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-2">
+                                <label for="how_to_add">付け方:</label>
+                                <input type="number" id="how_to_add" name="how_to_add" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-2">
+                                <label for="size">サイズ:</label>
+                                <div class="d-flex print_information_input">
+                                    <input type="number" id="size1" name="size1" class="form-control me-1">
+                                    <span class="d-flex align-items-center">×</span>
+                                    <input type="number" id="size2" name="size2" class="form-control ms-1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-2">
+                                <label for="send_designation">セパ巾送り指定:</label>
+                                <div class="d-flex print_information_input">
+                                    <input type="number" id="send_designation1" name="send_designation1"
+                                        class="form-control me-1">
+                                    <span class="d-flex align-items-center">×</span>
+                                    <input type="number" id="send_designation2" name="send_designation2"
+                                        class="form-control ms-1">
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group mb-2">
-                                <label for="process">印字内容:</label>
+                                <label for="print_information">印字内容:</label>
                                 <div class="d-flex print_information_input">
                                     <input type="number" id="print_information1" name="print_information1"
                                         class="form-control me-3">
@@ -104,6 +123,9 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="select_value_container">
+
                     </div>
                 </div>
                 <div class="container-fluid d-flex justify-content-center mt-4 mb-2 p-0 csvBtn__container">
@@ -124,55 +146,135 @@
     // CSV配列生成ボタン
     var generate = document.querySelector(".generate");
 
-generate.addEventListener("click", function(){
-    generateArr();
-});
+    generate.addEventListener("click", function() {
+        generateArr();
+    });
 
-// CSV配列生成処理
-async function generateArr()
-{
-    var completion = document.getElementById("completion").value;
-    var floating = document.getElementById("floating").value;
-    var sort = document.getElementById("sort").value;
-    var column = document.getElementById("column").value;
-    var process = document.getElementById("process").value;
-    var num = document.getElementById("num").value;
-    var completion_piece = document.getElementById("completion_piece").value;
-    var direction = document.getElementById("direction").value;
-    var print_information1 = document.getElementById("print_information1").value;
-    var print_information2 = document.getElementById("print_information2").value;
+    // CSV配列生成処理
+    async function generateArr() {
+        // 仕上げ
+        var completion = document.getElementById("completion").value;
+        // 流れ方向
+        var floating = document.getElementById("floating").value;
+        // 昇順・降順
+        var sort = document.getElementById("sort").value;
+        // 列数
+        var column = document.getElementById("column").value;
+        // 数量
+        var num = document.getElementById("num").value;
+        // 天地・左右
+        var direction = document.getElementById("direction").value;
+        // 各枚数
+        var each_page = document.getElementById("each_page").value;
+        // 付け方
+        var how_to_add = document.getElementById("how_to_add").value;
+        // サイズ１（巾）
+        var size1 = document.getElementById("size1").value;
+        // サイズ２（送り(単位)mm）
+        var size2 = document.getElementById("size2").value;
+        // セパ巾送り指定１（セパ巾）
+        var send_designation1 = document.getElementById("send_designation1").value;
+        // セパ巾送り指定２（送り指定 (単位)mm）
+        var send_designation2 = document.getElementById("send_designation2").value;
 
-    var data = {
-        completion: completion,
-        floating: floating,
-        sort: sort,
-        column: column,
-        process: process,
-        num: num,
-        completion_piece: completion_piece,
-        direction: direction,
-        print_information1: print_information1,
-        print_information2: print_information2
+
+        // 印字内容
+        var print_information1 = document.getElementById("print_information1").value;
+        var print_information2 = document.getElementById("print_information2").value;
+
+        // 仕上げ丁数
+        var completion_piece = document.getElementById("completion_piece");
+        // 一束のシート数
+        var a_bundle_of_sheet = document.getElementById("a_bundle_of_sheet");
+        // 印刷列数
+        var print_column = document.getElementById("print_column");
+        // 工程数
+        var process = document.getElementById("process");
+        // 原紙最大巻ｍ数
+        var max_base_sheet = document.getElementById("max_base_sheet");
+
+        // 巻き枚数
+        var roll_num = document.getElementById("roll_num");
+        // リード紙巻芯
+        var lead_inside = document.getElementById("lead_inside");
+        // リード紙巻外
+        var lead_outside = document.getElementById("lead_outside");
+
+        // 一束の折り数
+        var a_bundle_of_fold = document.getElementById("a_bundle_of_fold");
+
+        if (completion == 1) {
+            var completion_data = {
+                completion_piece: completion_piece.value,
+                a_bundle_of_sheet: a_bundle_of_sheet.value,
+                print_column: print_column.value,
+                process: process.value,
+                max_base_sheet: max_base_sheet.value
+            }
+        } else if (completion == 2) {
+            var completion_data = {
+                roll_num: roll_num.value,
+                lead_inside: lead_inside.value,
+                lead_outside: lead_outside.value,
+                print_column: print_column.value,
+                process: process.value,
+                max_base_sheet: max_base_sheet.value
+            }
+        } else if (completion == 3) {
+            var completion_data = {
+                completion_piece: completion_piece.value,
+                a_bundle_of_fold: a_bundle_of_fold.value,
+                print_column: print_column.value,
+                process: process.value,
+                max_base_sheet: max_base_sheet.value
+            }
+        }
+
+
+        var data = {
+            completion: completion,
+            floating: floating,
+            sort: sort,
+            column: column,
+            num: num,
+            direction: direction,
+            // 各枚数
+            each_page: each_page,
+            // 付け方
+            how_to_add: how_to_add,
+            // サイズ１（巾）
+            size1: size1,
+            // サイズ２（送り(単位)mm）
+            size2: size2,
+            // セパ巾送り指定１（セパ巾）
+            end_designation1: send_designation1,
+            // セパ巾送り指定２（送り指定 (単位)mm）
+            send_designation2: send_designation2,
+
+
+            completion_data: completion_data,
+            print_information1: print_information1,
+            print_information2: print_information2,
+        }
+
+        try {
+            const url = "{{ route('generateArr') }}";
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data)
+            })
+            const result = await response.json();
+            csvArray = result;
+            console.log(csvArray);
+        } catch (error) {
+            console.log(error);
+            alert(`通信に失敗しました。\r\n ${error}`);
+        }
     }
-
-    try {
-        const url = "{{ route('generateArr') }}";
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data)
-        })
-        const result = await response.json();
-        csvArray = result;
-        console.log(csvArray);
-    } catch (error) {
-        console.log(error);
-        alert(`通信に失敗しました。\r\n ${error}`);
-    }
-}
 </script>
 
 </html>
