@@ -45,7 +45,7 @@ class GenerateArrayController extends Controller
                         for ($i = $print_information1; $i <= (int)$input['print_information2']; $i++) {
                             // 一束の数を超えたらbreak
                             if ($i >= $print_information1 + $a_bundle) {
-                                $print_information1 += $i;
+                                $print_information1 = $i;
                                 break;
                             }
                             array_push($subArray, $i);
@@ -100,13 +100,46 @@ class GenerateArrayController extends Controller
     public function Zsort($arr, $column, $sort)
     {
 
-        $chunks = array(); // 空の配列を初期化
+        $merge = array(); // 空の配列を初期化
 
-        for ($i = 0; $i < count($arr); $i++) {
-            $chunks = array_merge($chunks, $arr[$i]); // $chunksに新しい要素を追加
+        // 昇順
+        if ($sort == 1) {
+            for ($i = 0; $i < count($arr); $i++) {
+                $merge = array_merge($merge, $arr[$i]); // $chunksに新しい要素を追加
+            }
+
+            return $chunk = $this->zChunk($merge, $column);
         }
+
+
+
+        // 降順
+        if ($sort == 2) {
+            for ($i = 0; $i < count($arr); $i++) {
+                krsort($arr[$i]);
+            }
+
+            krsort($arr);
+
+            $first_key = array_key_first($arr);
+            for ($i = $first_key; $i >= 0; $i--) {
+                $merge = array_merge($merge, $arr[$i]);
+            }
+
+            return $chunk = $this->zChunk($merge, $column);
+        }
+    }
+
+    /**
+     * Z字　列数に分けるのと、足りない分「””」追加
+     * @param merge
+     * @param column
+     * @return chunk
+     */
+    public function zChunk($merge, $column)
+    {
         // インデックスを仕上げ列数に分ける
-        $chunk = array_chunk($chunks, (int)$column);
+        $chunk = array_chunk($merge, (int)$column);
         // 0番目の値数
         $first = count($chunk[0]);
         // 最後のキー取得
@@ -121,31 +154,6 @@ class GenerateArrayController extends Controller
                 array_push($chunk[$last_key], "");
             }
         }
-
-        // 降順
-        if ($sort == 2) {
-            return $chunk = $this->descendDirection($chunk);
-        }
-
-
-
-        // $aaaaa = $chunk[0][1][0];
-
-        // foreach ($chunk as $chunk) {
-        //     $j = 0;
-        //     for ($i = 0; $i < count($chunk); $i++) {
-        //         // $unko = $this->get_last_key_value($chunk[$i]);
-        //         $last_key = array_key_last($chunk[$i]);
-        //         for ($j = 0; $j < $last_key; $j++) {
-        //             array_push($abc, $chunk[$i][$j]);
-        //             if ($j == $last_key -1) {
-        //                 break;
-        //             }
-        //         }
-        //     }
-        // }
-
-
         return $chunk;
     }
 
