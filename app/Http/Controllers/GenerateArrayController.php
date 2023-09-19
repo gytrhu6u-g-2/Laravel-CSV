@@ -62,26 +62,10 @@ class GenerateArrayController extends Controller
 
                 // 流れ方向　逆N字
                 if ($input['floating'] == 2) {
-                    // 初期の値を設定
-                    $arr = [0];
-
-                    // 最後のキーの0番目の値
-                    $last = $this->get_last_key_value($arr);
-
-                    // 列数
-                    $column = (int)$input['column'];
-                    // 丁数
-                    $piece = $input['completion_data']['completion_piece'] / $column;
-                    // 印字内容1
-                    $print_information1 = (int)$input['print_information1'];
-                    // 印字内容2
-                    $print_information2 = (int)$input['print_information2'];
-                    // 仕上げ付丁数
-                    $completion_piece = (int)$input['completion_data']['completion_piece'];
 
                     // 昇順・降順
                     if ($input['sort']) {
-                        $chunk = $this->Nsort($arr, $last, $piece, $print_information1, $print_information2, $completion_piece, $column, $input['sort']);
+                        $chunk = $this->Nsort($input, $Total_number_of_bundles_record, $a_bundle, $a_bundle_of_meters, $maximum_number_of_bundles);
                     }
                 }
             }
@@ -108,7 +92,7 @@ class GenerateArrayController extends Controller
                 $merge = array_merge($merge, $arr[$i]); // $chunksに新しい要素を追加
             }
 
-            return $chunk = $this->zChunk($merge, $column);
+            return $this->zChunk($merge, $column);
         }
 
 
@@ -126,7 +110,7 @@ class GenerateArrayController extends Controller
                 $merge = array_merge($merge, $arr[$i]);
             }
 
-            return $chunk = $this->zChunk($merge, $column);
+            return $this->zChunk($merge, $column);
         }
     }
 
@@ -163,74 +147,123 @@ class GenerateArrayController extends Controller
      * @param column
      * @return arr
      */
-    public function Nsort($arr, $last, $piece, $print_information1, $print_information2, $completion_piece, $column, $sort)
+    public function Nsort($input, $Total_number_of_bundles_record, $a_bundle, $a_bundle_of_meters, $maximum_number_of_bundles)
     {
         // 初めは0番目を置き換えるため1に設定
         $i = 1;
         // 0番目の配列を印字内容1に置き換えるため
         $first_arr = 0;
 
-        // 最後のキーの0番目の値＋丁数が印字内容2の値を上回るまでループ
-        while ($last + $piece <= $print_information2) {
+        // 初期の値を設定
+        $arr = [];
+        // 多次元配列
+        $subArray = [0];
 
-            // 丁数の分だけfor文を回す
-            for ($i; $i < $piece; $i++) {
-                // 0番目を印字内容1に置き換える
-                if ($first_arr == 0) {
-                    $arr[0] = $print_information1;
+        // 最後のキーの0番目の値
+        $last = $this->get_last_key_value($subArray);
+
+        // 列数
+        $column = (int)$input['column'];
+        // 丁数
+        $piece = $input['completion_data']['completion_piece'] / $column;
+        // 印字内容1
+        $print_information1 = (int)$input['print_information1'];
+        // 印字内容2
+        $print_information2 = (int)$input['print_information2'];
+        // 仕上げ付丁数
+        $completion_piece = (int)$input['completion_data']['completion_piece'];
+
+        $sort = (int)$input['sort'];
+
+        // 足すための１束数
+        $temp_a_bundle = $input['completion_data']['completion_piece'] * $input['completion_data']['a_bundle_of_sheet'];
+
+        // breakするフラグを立てる
+        $break_flg = false;
+
+        for ($a = 0; $a <= $Total_number_of_bundles_record; $a++) {
+            while ($last + $piece <= $print_information2) {
+                // 最後のキーの0番目の値＋丁数が印字内容2の値を上回るまでループ
+                // 丁数の分だけfor文を回す
+                for ($i; $i < $piece; $i++) {
+                    // 0番目を印字内容1に置き換える
+                    if ($first_arr == 0) {
+                        $subArray[0] = $print_information1;
+                        $print_information1 += 1;
+                    }
+                    if ($print_information1 > $print_information2) {
+                        $break_flg = true;
+                        break;
+                    }
+
+                    // 配列に印字内容1を入れていく
+                    array_push($subArray, $print_information1);
                     $print_information1 += 1;
+                    // 初回1ループ目の配列0番目だけ
+                    $first_arr += 1;
                 }
-                if ($print_information1 >= $print_information2 + 1) {
+                if ($break_flg) {
                     break;
                 }
-                // 配列に印字内容1を入れていく
-                array_push($arr, $print_information1);
-                $print_information1 += 1;
 
-                // 初回1ループ目の配列0番目だけ
-                $first_arr += 1;
+                // 最後のキーの0番目の値
+                $last = $this->get_last_key_value($subArray);
+
+                // 逆N字　計算
+                $print_information1 = $piece * ($column - 1) + 1;
+                $print_information1 += $last;
+
+                // 0に戻す
+                $i = 0;
+
+                // 最後のキーの0番目の値＋丁数が印字内容2の値を上回ると強制でbreak
+                if ($print_information1 >= $a_bundle + 1) {
+                    $a_bundle += $temp_a_bundle;
+                    // 多次元配列に新しい配列を追加
+                    array_push($arr, $subArray);
+                    $subArray = [];
+                    break;
+                }
             }
-
-            // 最後のキーの0番目の値
-            $last = $this->get_last_key_value($arr);
-
-            // 逆N字　計算
-            $print_information1 = $piece * ($column - 1) + 1;
-            $print_information1 += $last;
-
-            // 0に戻す
-            $i = 0;
-
-            // 最後のキーの0番目の値＋丁数が印字内容2の値を上回ると強制でbreak
-            if ($print_information1 >= $print_information2 + 1) {
+            // whileから抜けた残りを配列に追加
+            if ($subArray) {
+                // 多次元配列に新しい配列を追加
+                array_push($arr, $subArray);
                 break;
             }
         }
 
-        // 配列の数
-        $count = count($arr);
-        // 配列を一列で設定
-        $chunk = array_chunk($arr, 1);
-        // 丁数の固定値
-        $fixed_piece = $completion_piece / $column;
-        for ($i = 0; $i < $count; $i++) {
-            // 配列の値
-            $arr_value = $arr[$i];
-            for ($j = 1; $j < $column; $j++) {
-                // 配列の値＋丁数
-                $arr_piece = $arr_value + $piece;
+        // 空の配列を作成
+        $chunk = array();
 
-                // 印字内容2以上になればbreak
-                if ($arr_piece >= $print_information2 + 1) {
-                    break;
+        for ($i = 0; $i < count($arr); $i++) {
+            // 配列の数
+            $count = count($arr[$i]);
+            // 配列を一列で設定
+            $rowChunk = array_chunk($arr[$i], 1);
+            // 丁数の固定値
+            $fixed_piece = $completion_piece / $column;
+            for ($j = 0; $j < $count; $j++) {
+                // 配列の値
+                $arr_value = $arr[$i][$j];
+                for ($k = 1; $k < $column; $k++) {
+                    // 配列の値＋丁数
+                    $arr_piece = $arr_value + $piece;
+
+                    // 印字内容2以上になればbreak
+                    if ($arr_piece >= $print_information2 + 1) {
+                        break;
+                    }
+                    array_push($rowChunk[$j], $arr_piece);
+                    // 固定値を丁数に代入
+                    $piece += $fixed_piece;
                 }
-                array_push($chunk[$i], $arr_piece);
-                // 固定値を丁数に代入
-                $piece += $fixed_piece;
+                // 丁数を元に戻す
+                $piece = $piece / $k;
+                $k = 1;
             }
-            // 丁数を元に戻す
-            $piece = $piece / $j;
-            $j = 1;
+            // 配列のマージ
+            $chunk = array_merge($chunk, $rowChunk);
         }
         // 0番目の値数
         $first = count($chunk[0]);
