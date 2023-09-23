@@ -135,6 +135,11 @@
                         <button type="submit" class="btn btn-primary ms-3">ダウンロード</button>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                     </form>
+                    <form action="{{ route('practice') }}" method="GET">
+                        @csrf
+                        <button type="submit" class="btn btn-primary ms-3">練習</button>
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                    </form>
                 </div>
             </div>
         </div>

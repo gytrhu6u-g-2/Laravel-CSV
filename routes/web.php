@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CSVController;
 use App\Http\Controllers\GenerateArrayController;
+use App\Http\Controllers\TestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,3 +24,6 @@ Route::post('/generate', [GenerateArrayController::class, 'generateArr'])->name(
 
 // CSVダウンロード
 Route::post('/download', [CSVController::class, 'download'])->name('download');
+
+// 練習
+Route::get('/practice', [TestController::class, 'practice'])->name('practice');
