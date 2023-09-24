@@ -11,10 +11,10 @@ class TestController extends Controller
 
     public function practice()
     {
-        $print1 = 1;
-        $print2 = 4000;
+        $print1 = 5;
+        $print2 = 11;
 
-        $retsu = 2;
+        $column = 2;
         $chosu = 10;
 
         $soTaba = 2;
@@ -27,7 +27,6 @@ class TestController extends Controller
         }
 
         $common = new Common();
-        $common->Nchunk($array, $retsu, $chosu, $soTaba, $print2);
-
+        $common->Nchunk($array, $column, $chosu, $print1, $print2);
     }
 }

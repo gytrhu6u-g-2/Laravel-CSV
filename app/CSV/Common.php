@@ -4,29 +4,47 @@ namespace App\CSV;
 
 class Common
 {
-    public function Nchunk($array, $retsu, $chosu, $soTaba, $print2)
+    public function Nchunk($array, $column, $chosu, $print1, $print2)
     {
         $index = 0;
-        $array2 = array();
+        $slice_index = 0;
+        $tmp_array = array();
 
 
-        $zenbu = ceil($print2 / ($retsu * $chosu));
+        $all = ceil(((($print2 - $print1) + 1)) / ($column * $chosu));
 
-        $last = $retsu * $chosu;
-        // 総束数分回す
-        for ($i = 0; $i < $soTaba; $i++) {
-            // 丁数✖️列分回す
-            for ($j = 0; $j < $zenbu; $j++) {
-                $output = array_slice($array, $index, $last);
+        $last = $column * $chosu;
 
-                for ($k = 0; $k < $chosu; $k++) {
-                    for ($l = 0; $l < $retsu; $l++) {
-                        array_push($array2, $output[$index]);
-                        $index += $chosu;
+        // 丁数✖️列分回す
+        for ($j = 0; $j < $all; $j++) {
+            // インデックスの開始から終わりをスライス
+            $output = array_slice($array, $slice_index, $last);
+
+            // 丁数
+            for ($k = 0; $k < $chosu; $k++) {
+                // 列
+                for ($l = 1; $l <= $column; $l++) {
+                    // キーが存在するかの判断
+                    if (isset($output[$index])) {
+                        array_push($tmp_array, $output[$index]);
+                    } else {
+                        array_push($tmp_array, "");
                     }
-                    $index += 1;
+                    // 列数と等しい場合break
+                    if ($l == $column) {
+                        break;
+                    }
+                    $index += $chosu;
                 }
+                $index = $index - ($chosu * ($column - 1));
+                $index += 1;
             }
+            // 0に戻す
+            $index = 0;
+            $slice_index += $last;
         }
+
+        // 列数に分ける
+        $array = array_chunk($tmp_array, $column);
     }
 }
